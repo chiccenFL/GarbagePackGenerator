@@ -17,21 +17,32 @@ function createEditor(jsonData) {
     createFields(editorDiv, jsonData);
 }
 
-function createFields(container, data, parentKey = '') {
+function createFields(container, data, parentKey = '', indentLevel = 0) {
     if (Array.isArray(data)) {
         data.forEach((item, index) => {
-            createFields(container, item, `${parentKey}[${index}]`);
+            const arrayContainer = document.createElement('div');
+            arrayContainer.className = 'category indent';
+            arrayContainer.style.marginLeft = `${indentLevel * 20}px`;
+
+            const label = document.createElement('label');
+            label.textContent = `${parentKey}[${index}]`;
+            arrayContainer.appendChild(label);
+
+            createFields(arrayContainer, item, `${parentKey}[${index}]`, indentLevel + 1);
+            container.appendChild(arrayContainer);
         });
     } else if (typeof data === 'object' && data !== null) {
         for (const key in data) {
             const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'field';
+            fieldDiv.className = 'category indent';
+            fieldDiv.style.marginLeft = `${indentLevel * 20}px`;
+
             const label = document.createElement('label');
-            label.textContent = `${parentKey ? `${parentKey}.` : ''}${key}`;
+            label.textContent = key;
             fieldDiv.appendChild(label);
 
             if (typeof data[key] === 'object' && data[key] !== null) {
-                createFields(fieldDiv, data[key], `${parentKey ? `${parentKey}.` : ''}${key}`);
+                createFields(fieldDiv, data[key], `${parentKey ? `${parentKey}.` : ''}${key}`, indentLevel + 1);
             } else {
                 const input = document.createElement('input');
                 input.type = 'text';
@@ -43,11 +54,21 @@ function createFields(container, data, parentKey = '') {
             container.appendChild(fieldDiv);
         }
     } else {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'field';
+        fieldDiv.style.marginLeft = `${indentLevel * 20}px`;
+
+        const label = document.createElement('label');
+        label.textContent = parentKey;
+        fieldDiv.appendChild(label);
+
         const input = document.createElement('input');
         input.type = 'text';
         input.id = parentKey;
         input.value = data;
-        container.appendChild(input);
+        fieldDiv.appendChild(input);
+
+        container.appendChild(fieldDiv);
     }
 }
 
@@ -71,7 +92,7 @@ function collectFields(container) {
         } else {
             const nestedResult = collectFields(fieldDiv);
             if (Object.keys(nestedResult).length) {
-                const key = fieldDiv.querySelector('label').textContent.split('.').pop();
+                const key = label.textContent.split('.').pop();
                 result[key] = nestedResult;
             }
         }
