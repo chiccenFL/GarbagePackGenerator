@@ -58,4 +58,6 @@ function saveJson() {
     alert('JSON saved successfully!');
 }
 
-createEditor(jsonData);
+document.addEventListener('DOMContentLoaded', () => {
+    createEditor(jsonData);
+})
