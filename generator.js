@@ -25,7 +25,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
             arrayContainer.style.marginLeft = `${indentLevel * 20}px`;
 
             const label = document.createElement('label');
-            label.textContent = `${parentKey}[${index}]`;
+            label.textContent = `[${index}]`;
             arrayContainer.appendChild(label);
 
             createFields(arrayContainer, item, `${parentKey}[${index}]`, indentLevel + 1);
@@ -38,7 +38,8 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
             fieldDiv.style.marginLeft = `${indentLevel * 20}px`;
 
             const label = document.createElement('label');
-            label.textContent = key;
+            label.className = 'key-label';
+            label.textContent = `${key}:`;
             fieldDiv.appendChild(label);
 
             if (typeof data[key] === 'object' && data[key] !== null) {
@@ -59,7 +60,9 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
         fieldDiv.style.marginLeft = `${indentLevel * 20}px`;
 
         const label = document.createElement('label');
-        label.textContent = parentKey;
+        label.className = 'key-label';
+        const keyParts = parentKey.split('.');
+        label.textContent = `${keyParts[keyParts.length - 1]}:`;
         fieldDiv.appendChild(label);
 
         const input = document.createElement('input');
@@ -87,12 +90,12 @@ function collectFields(container) {
         const input = fieldDiv.querySelector('input');
 
         if (label && input) {
-            const keys = label.textContent.split('.').map(key => key.replace(/\[.*\]$/, ''));
+            const keys = label.textContent.replace(/:$/, '').split('.').map(key => key.replace(/\[.*\]$/, ''));
             setValue(result, keys, input.value);
         } else {
             const nestedResult = collectFields(fieldDiv);
             if (Object.keys(nestedResult).length) {
-                const key = label.textContent.split('.').pop();
+                const key = label.textContent.replace(/:$/, '').split('.').pop();
                 result[key] = nestedResult;
             }
         }
