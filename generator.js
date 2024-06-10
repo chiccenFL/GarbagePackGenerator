@@ -22,7 +22,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
         data.forEach((item, index) => {
             const arrayContainer = document.createElement('div');
             arrayContainer.className = 'category indent';
-            arrayContainer.style.marginLeft = `${indentLevel * 20}px`;
+            arrayContainer.style.marginLeft = `${(indentLevel * 10) + 5}px`;
 
             const label = document.createElement('label');
             label.className = 'key-label';
@@ -36,7 +36,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
         for (const key in data) {
             const fieldDiv = document.createElement('div');
             fieldDiv.className = 'category indent';
-            fieldDiv.style.marginLeft = `${indentLevel * 20}px`;
+            fieldDiv.style.marginLeft = `${(indentLevel * 10) + 5}px`;
 
             const label = document.createElement('label');
             label.className = 'key-label';
@@ -44,7 +44,14 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
             fieldDiv.appendChild(label);
 
             if (typeof data[key] === 'object' && data[key] !== null) {
+                const categoryToggle = document.createElement('spam');
+                categoryToggle.className = 'toggle';
+                categoryToggle.textContent = ' [-]';
+                label.appendChild(categoryToggle);
                 createFields(fieldDiv, data[key], `${parentKey ? `${parentKey}.` : ''}${key}`, indentLevel + 1);
+                categoryToggle.addEventListener('click', () => {
+                    toggleVategory(categoryToggle);
+                })
             } else {
                 const input = document.createElement('input');
                 input.type = 'text';
@@ -58,7 +65,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
     } else {
         const fieldDiv = document.createElement('div');
         fieldDiv.className = 'field';
-        fieldDiv.style.marginLeft = `${indentLevel * 20}px`;
+        fieldDiv.style.marginLeft = `${(indentLevel * 10) + 5}px`;
 
         const label = document.createElement('label');
         label.className = 'key-label';
@@ -73,6 +80,17 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
         fieldDiv.appendChild(input);
 
         container.appendChild(fieldDiv);
+    }
+}
+
+function toggleCategory(toggle) {
+    const category = toggle.parentElement.nextElementSibling;
+    if (category.style.display === 'none' || category.style.display === '') {
+        category.style.display = 'block';
+        toggle.textContent = ' [-]';
+    } else {
+        category.style.display = 'none';
+        toggle.textContent = ' [+]';
     }
 }
 
