@@ -1,63 +1,93 @@
-const jsonData = {
-    "BeforeAll": {
-        "task1": "Setup environment",
-        "task2": "Install dependencies"
-    },
-    "AfterAll": {
-        "task1": "Cleanup environment",
-        "task2": "Remove temporary files"
-    },
-    "GarbageCans": {
-        "can1": "Recycle bin",
-        "can2": "Trash bin",
-        "can3": "Compost bin",
-        "can4": "Glass bin",
-        "can5": "Plastic bin",
-        "can6": "Metal bin",
-        "can7": "Paper bin",
-        "can8": "E-waste bin",
-        "can9": "Hazardous waste bin"
+async function fetchJsonData() {
+    try {
+        const response = await fetch('default.json');
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        const jsonData = await response.json();
+        createEditor(jsonData);
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
     }
-};
+}
 
 function createEditor(jsonData) {
     const editorDiv = document.getElementById('editor');
-    for (const category in jsonData) {
-        const categoryDiv = document.createElement('div');
-        categoryDiv.className = 'category';
-        const categoryTitle = document.createElement('h2');
-        categoryTitle.textContent = category;
-        categoryDiv.appendChild(categoryTitle);
+    editorDiv.innerHTML = ''; // Clear previous content if any
+    createFields(editorDiv, jsonData);
+}
 
-        for (const key in jsonData[category]) {
+function createFields(container, data, parentKey = '') {
+    if (Array.isArray(data)) {
+        data.forEach((item, index) => {
+            createFields(container, item, `${parentKey}[${index}]`);
+        });
+    } else if (typeof data === 'object' && data !== null) {
+        for (const key in data) {
             const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'field';
             const label = document.createElement('label');
-            label.textContent = key;
-            const textarea = document.createElement('textarea');
-            textarea.id = `${category}_${key}`;
-            textarea.value = jsonData[category][key];
+            label.textContent = `${parentKey ? `${parentKey}.` : ''}${key}`;
             fieldDiv.appendChild(label);
-            fieldDiv.appendChild(textarea);
-            categoryDiv.appendChild(fieldDiv);
-        }
 
-        editorDiv.appendChild(categoryDiv);
+            if (typeof data[key] === 'object' && data[key] !== null) {
+                createFields(fieldDiv, data[key], `${parentKey ? `${parentKey}.` : ''}${key}`);
+            } else {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `${parentKey ? `${parentKey}.` : ''}${key}`;
+                input.value = data[key];
+                fieldDiv.appendChild(input);
+            }
+
+            container.appendChild(fieldDiv);
+        }
+    } else {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = parentKey;
+        input.value = data;
+        container.appendChild(input);
     }
 }
 
 function saveJson() {
-    const newJsonData = {};
-    for (const category in jsonData) {
-        newJsonData[category] = {};
-        for (const key in jsonData[category]) {
-            const textarea = document.getElementById(`${category}_${key}`);
-            newJsonData[category][key] = textarea.value;
-        }
-    }
+    const editorDiv = document.getElementById('editor');
+    const newJsonData = collectFields(editorDiv);
     console.log('Saved JSON:', newJsonData);
     alert('JSON saved successfully!');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    createEditor(jsonData);
-})
+function collectFields(container) {
+    const result = {};
+
+    for (const fieldDiv of container.children) {
+        const label = fieldDiv.querySelector('label');
+        const input = fieldDiv.querySelector('input');
+
+        if (label && input) {
+            const keys = label.textContent.split('.').map(key => key.replace(/\[.*\]$/, ''));
+            setValue(result, keys, input.value);
+        } else {
+            const nestedResult = collectFields(fieldDiv);
+            if (Object.keys(nestedResult).length) {
+                const key = fieldDiv.querySelector('label').textContent.split('.').pop();
+                result[key] = nestedResult;
+            }
+        }
+    }
+
+    return result;
+}
+
+function setValue(obj, keys, value) {
+    const lastKey = keys.pop();
+    const nestedObj = keys.reduce((acc, key) => {
+        if (!acc[key]) acc[key] = {};
+        return acc[key];
+    }, obj);
+    nestedObj[lastKey] = value;
+}
+
+// Initialize the editor by fetching JSON data
+document.addEventListener('DOMContentLoaded', fetchJsonData);
