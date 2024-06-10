@@ -25,6 +25,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
             arrayContainer.style.marginLeft = `${indentLevel * 20}px`;
 
             const label = document.createElement('label');
+            label.className = 'key-label';
             label.textContent = `[${index}]`;
             arrayContainer.appendChild(label);
 
@@ -39,7 +40,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
 
             const label = document.createElement('label');
             label.className = 'key-label';
-            label.textContent = `${key}:`;
+            label.textContent = '${key}: ';
             fieldDiv.appendChild(label);
 
             if (typeof data[key] === 'object' && data[key] !== null) {
@@ -62,7 +63,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
         const label = document.createElement('label');
         label.className = 'key-label';
         const keyParts = parentKey.split('.');
-        label.textContent = `${keyParts[keyParts.length - 1]}:`;
+        label.textContent = '${keyParts[keyParts.length - 1]}: ';
         fieldDiv.appendChild(label);
 
         const input = document.createElement('input');
