@@ -40,7 +40,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
 
             const label = document.createElement('label');
             label.className = 'key-label';
-            label.textContent = '${key}: ';
+            label.textContent = `${key}: `;
             fieldDiv.appendChild(label);
 
             if (typeof data[key] === 'object' && data[key] !== null) {
@@ -70,7 +70,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
         const label = document.createElement('label');
         label.className = 'key-label';
         const keyParts = parentKey.split('.');
-        label.textContent = '${keyParts[keyParts.length - 1]}: ';
+        label.textContent = `${keyParts[keyParts.length - 1]}: `;
         fieldDiv.appendChild(label);
 
         const input = document.createElement('input');
@@ -94,11 +94,22 @@ function toggleCategory(toggle) {
     }
 }
 
+
 function saveJson() {
     const editorDiv = document.getElementById('editor');
     const newJsonData = collectFields(editorDiv);
-    console.log('Saved JSON:', newJsonData);
-    alert('JSON saved successfully!');
+    const jsonDataString = JSON.stringify(newJsonData, null, 4);
+    
+    // Create a Blob object from the JSON string
+    const blob = new Blob([jsonDataString], { type: 'application/json' });
+    
+    // Create a temporary anchor element
+    const anchor = document.createElement('a');
+    anchor.download = 'garbagepack.json'; // Set the download attribute with the desired file name
+    anchor.href = URL.createObjectURL(blob);
+    
+    // Trigger the download
+    anchor.click();
 }
 
 function collectFields(container) {
