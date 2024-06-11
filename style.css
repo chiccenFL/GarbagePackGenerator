@@ -6,7 +6,7 @@ body {
     padding: 20px;
 }
 .category, .field, .sub-field {
-    border: 1px solid #8b4513; /* Darker brown border */
+    border: 3px solid #8b4513; /* Darker brown border */
     background-color: #deb887; /* Base brown color */
     padding: 10px;
     margin: 5px 0;
@@ -33,7 +33,7 @@ button {
 }
 .indent {
     padding-left: 20px;
-    border-left: 1px solid #ccc;
+    border-left: 3px solid #ccc;
     margin-left: 10px;
 }
 .key-label {
