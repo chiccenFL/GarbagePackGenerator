@@ -1,10 +1,19 @@
 body {
+    background-color: #f5deb3; /* Light brown/tan color */
     font-family: Arial, sans-serif;
-    margin: 20px;
+    color: #333;
+    margin: 0;
+    padding: 20px;
 }
 .category, .field, .sub-field {
-    margin-bottom: 10px;
-    padding-left: 20px;
+    border: 1px solid #8b4513; /* Darker brown border */
+    background-color: #deb887; /* Base brown color */
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+.category.indent {
+    margin-left: 20px;
 }
 .field {
     display: flex;
@@ -29,5 +38,19 @@ button {
 }
 .key-label {
     margin-right: 5px;
-    margin-bottom: 10px;
+    font-weight: bold;
+}
+.toggle {
+    cursor: pointer;
+    margin-left: 5px;
+    color: #8b4513; /* Darker brown color for toggle */
+}
+.nested-1 {
+    background-color: #d2b48c;
+}
+.nested-2 {
+    background-color: #c3a070;
+}
+.nested-3 {
+    background-color: #b38c54;
 }
