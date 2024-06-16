@@ -21,7 +21,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
     if (Array.isArray(data)) {
         data.forEach((item, index) => {
             const arrayContainer = document.createElement('div');
-            arrayContainer.className = 'category indent nested-${indentLevel}';
+            arrayContainer.className = `category indent nested-${indentLevel}`;
             arrayContainer.style.marginLeft = `${(indentLevel * 10) + 5}px`;
 
             const label = document.createElement('label');
@@ -35,7 +35,7 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
     } else if (typeof data === 'object' && data !== null) {
         for (const key in data) {
             const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'category indent nested-${indentLevel}';
+            fieldDiv.className = `category indent nested-${indentLevel}`;
             fieldDiv.style.marginLeft = `${(indentLevel * 10) + 5}px`;
 
             const label = document.createElement('label');
@@ -48,10 +48,15 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
                 categoryToggle.className = 'toggle';
                 categoryToggle.textContent = ' [-]';
                 label.appendChild(categoryToggle);
-                createFields(fieldDiv, data[key], `${parentKey ? `${parentKey}.` : ''}${key}`, indentLevel + 1);
+
+                const subCategory = document.createElement('div');
+                subCategory.className = 'collapsible open';
+                createFields(subCategory, data[key], `${parentKey ? `${parentKey}.` : ''}${key}`, indentLevel + 1);
+                fieldDiv.appendChild(subCategory);
+
                 categoryToggle.addEventListener('click', () => {
-                    toggleVategory(categoryToggle);
-                })
+                    toggleCategory(subCategory, categoryToggle);
+                });
             } else {
                 const input = document.createElement('input');
                 input.type = 'text';
@@ -83,31 +88,29 @@ function createFields(container, data, parentKey = '', indentLevel = 0) {
     }
 }
 
-function toggleCategory(toggle) {
-    const category = toggle.parentElement.nextElementSibling;
-    if (category.style.display === 'none' || category.style.display === '') {
-        category.style.display = 'block';
-        toggle.textContent = ' [-]';
-    } else {
-        category.style.display = 'none';
+function toggleCategory(category, toggle) {
+    if (category.style.maxHeight) {
+        category.style.maxHeight = null;
         toggle.textContent = ' [+]';
+    } else {
+        category.style.maxHeight = category.scrollHeight + 'px';
+        toggle.textContent = ' [-]';
     }
 }
-
 
 function saveJson() {
     const editorDiv = document.getElementById('editor');
     const newJsonData = collectFields(editorDiv);
     const jsonDataString = JSON.stringify(newJsonData, null, 4);
-    
+
     // Create a Blob object from the JSON string
     const blob = new Blob([jsonDataString], { type: 'application/json' });
-    
+
     // Create a temporary anchor element
     const anchor = document.createElement('a');
     anchor.download = 'garbagepack.json'; // Set the download attribute with the desired file name
     anchor.href = URL.createObjectURL(blob);
-    
+
     // Trigger the download
     anchor.click();
 }
